@@ -21,7 +21,7 @@ createSubsets <- function(minClassTrain, mayClassTrain){
   dfs
 }
 
-prediccion <- function(ensemble, x, q){
+prediction <- function(ensemble, x, q){
   pred <- data.frame(matrix(nrow=nrow(x),ncol=0))
   for(modelo in ensemble) pred <- cbind(pred, predict(modelo,x))
   pred <- apply(pred, 1, function(x) prop.table(table(x))["NO"])
@@ -76,14 +76,14 @@ createEnsemble<- function(metric){
             u
           } else metricas(data.frame(
             obs = test.set$classificationCol,
-            pred= prediccion(Ek, test.set[-classificationCol], q = dt)
+            pred= prediction(Ek, test.set[-classificationCol], q = dt)
           ))
         
         Ek[[length(Ek)+1]] <- rf
         # Evaluamos el ensemble formado al añadir el nuevo modelo
         metricas.ensemble.2 <- metricas(data.frame(
           obs = test.set$classificationCol,
-          pred= prediccion(Ek, test.set[-classificationCol], q = dt)
+          pred= prediction(Ek, test.set[-classificationCol], q = dt)
         ))
         # Comparamos las metricas
         if(metricas.ensemble.2[metric] <= metricas.ensemble[metric]){ # Si el ensemble no mejora con el nuevo modelo...
@@ -109,9 +109,9 @@ numberModels <- function(ensemble){
   
 }
 
-prediccion.final <- function(ensemble, x, q = 0.5, q1){
+final.prediction <- function(ensemble, x, q = 0.5, q1){
   # Colocamos en cada fila de un conjunto de datos todas las predicciones para una muestra
-  pred <- as.data.frame(lapply(ensemble, function(e) prediccion(e,x, q = q1)))
+  pred <- as.data.frame(lapply(ensemble, function(e) prediction(e,x, q = q1)))
   
   pred <- apply(pred, 1, function(x) prop.table(table(x))["NO"])
   ifelse(is.na(pred) | pred<q, "YES", "NO")
