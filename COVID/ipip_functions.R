@@ -28,7 +28,7 @@ prediction <- function(ensemble, x, q){
   ifelse(is.na(pred) | pred<q, "YES", "NO")
 }
 
-metricas <- function(data, lev = levels(as.factor(data$obs)), model = NULL){
+metrics <- function(data, lev = levels(as.factor(data$obs)), model = NULL){
   c(
     ACCURACY = MLmetrics::Accuracy(data[, "pred"], data[, "obs"]),
     SENS = sensitivity(data[, "pred"],data[, "obs"],positive="YES",negative="NO"),
@@ -69,24 +69,24 @@ createEnsemble<- function(metric){
         
         
         # Evaluamos el ensemble actual (sin el nuevo modelo)
-        metricas.ensemble <-
+        ensemble.metrics <-
           if (length(Ek)==0){
             u <- -Inf
             names(u) <- metric
             u
-          } else metricas(data.frame(
+          } else metrics(data.frame(
             obs = test.set$classificationCol,
             pred= prediction(Ek, test.set[-classificationCol], q = dt)
           ))
         
         Ek[[length(Ek)+1]] <- rf
         # Evaluamos el ensemble formado al añadir el nuevo modelo
-        metricas.ensemble.2 <- metricas(data.frame(
+        ensemble.metrics.2 <- metrics(data.frame(
           obs = test.set$classificationCol,
           pred= prediction(Ek, test.set[-classificationCol], q = dt)
         ))
         # Comparamos las metricas
-        if(metricas.ensemble.2[metric] <= metricas.ensemble[metric]){ # Si el ensemble no mejora con el nuevo modelo...
+        if(ensemble.metrics.2[metric] <= ensemble.metrics[metric]){ # Si el ensemble no mejora con el nuevo modelo...
           i <- i+1
           Ek[[length(Ek)]] <- NULL
         } else{ # En caso de ampliar el ensemble, reseteamos las oportunidades de cara a una nueva ampliación
