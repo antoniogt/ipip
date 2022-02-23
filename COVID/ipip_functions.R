@@ -5,18 +5,18 @@ mt <- function(n) { ceiling((b-n) / 3) }
 r.min <- 0.75
 bs <- 47
 
-createSubsets <- function(minClassTrain, mayClassTrain){
+createSubsets <- function(minClassTrain, majClassTrain){
   
-  #Partición
+  # Number of examples of the minority class in each balanced subset
   np <- round(nrow(minClassTrain)*as.double(r.min),0)
   dfs <- list()
   
-  # Seleccionamos todos los pacientes no ingresados que usaremos, y los reordenamos
-  id.may <- sample(sample(x = 1:nrow(mayClassTrain), size = bs*np), size = bs*np)
+  # We select all the examples of the majority class we will use, and we reorder them.
+  id.maj <- sample(sample(x = 1:nrow(majClassTrain), size = bs*np), size = bs*np)
   
   for(k in 1:bs){
     id.min <- sample(x = 1:nrow(minClassTrain), size = np, replace = TRUE)
-    dfs[[k]] <- rbind(mayClassTrain[id.may[1:np + np*(k-1)],],minClassTrain[id.min,])
+    dfs[[k]] <- rbind(majClassTrain[id.maj[1:np + np*(k-1)],],minClassTrain[id.min,])
   }
   dfs
 }
@@ -44,21 +44,21 @@ createEnsemble<- function(metric){
   set.seed(12)
     
     for(k in 1:bs){
-      Ek <- list() # Ensemble de modelos k-ésimo
-      i <- 0 # Contador para el número de intentos de ampliar el ensemble
-      # Conjunto de datos perfectamente balanceado:
+      Ek <- list() # k-th set of models
+      i <- 0 # Counter for the number of attempts to enlarge the ensemble
       
       df <- createSubsets(minClassTrain,maxClassTrain)[[k]]
       while(length(Ek)<=b && i<mt(length(Ek),b)){
-        # Seleccionamos muestras para entrenar el modelo de random forest
-        mayority <- which(df$classificationCol == "NO")
+        # We select samples to train the basic models
+        majority <- which(df$classificationCol == "NO")
         minority <- which(df$classificationCol == "YES")
         ind.train <- c(
-          sample(mayority, size = round(round(nrow(minClassTrain)*as.double(r.min),0)*as.double(r.b),0), replace = TRUE),
+          sample(majority, size = round(round(nrow(minClassTrain)*as.double(r.min),0)*as.double(r.b),0), replace = TRUE),
           sample(minority, size = round(round(nrow(minClassTrain)*as.double(r.min),0)*as.double(r.b),0), replace = TRUE)
         )
         
-        rf <- train(
+        # Model to train with the previously selected data. Here we can choose the model to train from the 'caret' package.
+        model <- train(
           x = df[ind.train,-classificationCol],
           y = df[ind.train,classificationCol],
           method = "ranger",
@@ -68,7 +68,7 @@ createEnsemble<- function(metric){
         )
         
         
-        # Evaluamos el ensemble actual (sin el nuevo modelo)
+        # We evaluate the current ensemble (without including the new basic model).
         ensemble.metrics <-
           if (length(Ek)==0){
             u <- -Inf
@@ -79,26 +79,26 @@ createEnsemble<- function(metric){
             pred= prediction(Ek, test.set[-classificationCol], q = dt)
           ))
         
-        Ek[[length(Ek)+1]] <- rf
-        # Evaluamos el ensemble formado al añadir el nuevo modelo
+        Ek[[length(Ek)+1]] <- model
+        # We evaluate the ensemble formed by adding the new basic model
         ensemble.metrics.2 <- metrics(data.frame(
           obs = test.set$classificationCol,
           pred= prediction(Ek, test.set[-classificationCol], q = dt)
         ))
-        # Comparamos las metricas
-        if(ensemble.metrics.2[metric] <= ensemble.metrics[metric]){ # Si el ensemble no mejora con el nuevo modelo...
+        # We compare the metric
+        if(ensemble.metrics.2[metric] <= ensemble.metrics[metric]){ # If the ensemble does not improve with the new model...
           i <- i+1
           Ek[[length(Ek)]] <- NULL
-        } else{ # En caso de ampliar el ensemble, reseteamos las oportunidades de cara a una nueva ampliación
+        } else{ # In case of enlargement of the ensemble, we reset the opportunities for further enlargement.
           i <- 0
         }
         
-      } # Fin del WHILE (hemos terminado de construir el ensemble k-ésimo)
+      } # We have finished building the k-th set of models 
       
-      # Guardamos la información del ensemble k-ésimo
+      # We add the k-th set to the final ensemble
       E[[length(E)+1]] <- Ek
       
-    } # FIN. Hemos terminado de contruir el ensemble final
+    } # end
     
     E
 }
@@ -110,7 +110,7 @@ numberModels <- function(ensemble){
 }
 
 final.prediction <- function(ensemble, x, q = 0.5, q1){
-  # Colocamos en cada fila de un conjunto de datos todas las predicciones para una muestra
+  # We place in each row of a dataset all the predictions for a sample.
   pred <- as.data.frame(lapply(ensemble, function(e) prediction(e,x, q = q1)))
   
   pred <- apply(pred, 1, function(x) prop.table(table(x))["NO"])
