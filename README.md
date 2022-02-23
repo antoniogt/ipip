@@ -18,9 +18,9 @@ Firstly, to comment on the different functions that are used in the IPIP algorit
 
 - **b**: For each of the 'bs' subsets, a certain number 'b' of basic models will be trained, which will form an ensemble. This number 'b' will be chosen so that each of the samples of the minority class will be used to train one of the 'b' models.
 
--**r.b**: The r.b variable refers to the percent of the examples of each balanced subset that we want to use to train each basic model.
+- **r.b**: The r.b variable refers to the percent of the examples of each balanced subset that we want to use to train each basic model.
 
--**mt**: Maximum number of possible attempts to further expand the ensemble, given by a function mt(|M|), whose value will depend on the number of basic models 'M' that is already added for a specific perfectly balanced subset.
+- **mt**: Maximum number of possible attempts to further expand the ensemble, given by a function mt(|M|), whose value will depend on the number of basic models 'M' that is already added for a specific perfectly balanced subset.
 
 About the IPIP functions:
 
@@ -28,11 +28,11 @@ About the IPIP functions:
 
 - **prediction**: This function makes predictions using a set of basic models. This function is used to create the final ensemble and to create the 'final.prediction' function.
 
--**final.prediction**: This function makes the prediction on the test data using the final ensemble generated with the 'createEnsemble' function.
+- **final.prediction**: This function makes the prediction on the test data using the final ensemble generated with the 'createEnsemble' function.
 
--**metrics**: This function obtain the accuracy, sensitivity, specificity, positive predictive value, negative predictive value, and Cohen's Kappa over the predictions makes with the 'prediction' or 'final.prediction' functions.
+- **metrics**: This function obtain the accuracy, sensitivity, specificity, positive predictive value, negative predictive value, and Cohen's Kappa over the predictions makes with the 'prediction' or 'final.prediction' functions.
 
--**numberModels**: This function obtains the number of basic models that form the final ensemble.
+- **numberModels**: This function obtains the number of basic models that form the final ensemble.
 
 # About
 
