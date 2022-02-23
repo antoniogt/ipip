@@ -10,9 +10,9 @@ Let's suppose that we want to make a binary (YES/NO) classification, where the '
 
 Firstly, to comment on the different functions that are used in the IPIP algorithm, let's detail the variables that are used on these functions:
 
--**bs**: Number of balanced subsets (subproblems) where each one will have a perfectly balanced data set associated to it, formed by samples of the original set.
+- **bs**: Number of balanced subsets (subproblems) where each one will have a perfectly balanced data set associated to it, formed by samples of the original set.
 
--**r.min**: The r.min variable refers to the percent of the original dataset's examples of the minority class that will be in each balanced subset.
+- **r.min**: The r.min variable refers to the percent of the original dataset's examples of the minority class that will be in each balanced subset.
 
 - **dt**: The dt (decision threshold) variable refers to the percent of models that have to classify an example as 'NO' to make the final ensemble predict 'NO'.  
 
