@@ -32,7 +32,7 @@ About the IPIP functions:
 
 - **numberModels**: This function obtains the number of basic models that form the final ensemble.
 
--**createEnsemble**: Create the final model, which will be an ensemble of several basic models trained on balanced subsets generated with the 'createSubsets' function. The input of this function is the metric that we want to optimize when creating the final model.
+- **createEnsemble**: Create the final model, which will be an ensemble of several basic models trained on balanced subsets generated with the 'createSubsets' function. The input of this function is the metric that we want to optimize when creating the final model.
 
 # About
 
